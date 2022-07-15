@@ -1,19 +1,32 @@
 package nl.coffeeit.aroma.pincode.presentation
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -31,7 +44,7 @@ private val DefaultErrorColor = Color(0xFFF7694A)
 private val DefaultFocusedBorderColor = Color(0xFF6650a4)
 private val DefaultUnfocusedBorderColor = Color(0xFF625b71)
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun PincodeView(
     lengthOfCode: Int = DEFAULT_LENGTH_OF_CODE,
@@ -72,8 +85,16 @@ fun PincodeView(
     Column(
         modifier = modifier
     ) {
+        var dropDownExpanded by remember { mutableStateOf(false) }
+
         Row(
-            Modifier.fillMaxWidth()
+            Modifier
+                .fillMaxWidth()
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onLongPress = { dropDownExpanded = true }
+                    )
+                }
         ) {
             val dividerModifier = Modifier
                 .height(dividerHeight)
@@ -83,7 +104,7 @@ fun PincodeView(
                     shape = inputCornerShape
                     clip = true
                 }
-            
+
             if (showDividerAfterInput == 0) {
                 DividerWithSpacerEnd(inputSpacing, dividerColor, dividerModifier)
             }
@@ -93,30 +114,57 @@ fun PincodeView(
                 var pincodeCharacter by remember { mutableStateOf(if (isError) "1" else "") }
                 val interactionSource = remember { MutableInteractionSource() }
 
+                val focusManager = LocalFocusManager.current
+                val clipboardManager = LocalClipboardManager.current
+                val isLastField = (i == lengthOfCode - 1)
+                val isFirstField = (i == 0)
+
+                val cellModifier = if (inputWidth != null) {
+                    Modifier
+                        .width(inputWidth)
+                        .wrapContentHeight()
+                } else {
+                    Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .wrapContentHeight()
+
+                }
+                    .background(
+                        color = inputColors.backgroundColor(enabled = true).value,
+                        shape = inputCornerShape
+                    )
+                    .onKeyEvent {
+                        if (it.key == Key.Backspace && !isFirstField) {
+                            focusManager.moveFocus(FocusDirection.Left)
+                        }
+                        return@onKeyEvent true
+                    }
+
                 BasicTextField(
                     value = pincodeCharacter,
                     onValueChange = {
-                        if (it.length <= MAXIMUM_AMOUNT_OF_CHARACTERS_PER_INPUT) pincodeCharacter = it
+                        if (it.length <= MAXIMUM_AMOUNT_OF_CHARACTERS_PER_INPUT) {
+                            pincodeCharacter = it
+                            if (it.isNotEmpty() && !isLastField) {
+                                focusManager.moveFocus(FocusDirection.Right)
+                            }
+                        }
                     },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = if (isLastField) ImeAction.Done else ImeAction.Next,
+                        keyboardType = KeyboardType.Number
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onNext = { focusManager.moveFocus(FocusDirection.Right) },
+                        onDone = { focusManager.clearFocus() }
+                    ),
                     singleLine = true,
                     maxLines = 1,
                     textStyle = if (isError) inputErrorTextStyle else inputTextStyle,
                     interactionSource = interactionSource,
                     cursorBrush = SolidColor(inputColors.cursorColor(isError = isError).value),
-                    modifier = if (inputWidth != null) {
-                        Modifier
-                            .width(inputWidth)
-                            .wrapContentHeight()
-                    } else {
-                        Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                            .wrapContentHeight()
-                    }.background(
-                        color = inputColors.backgroundColor(enabled = true).value,
-                        shape = inputCornerShape
-                    )
+                    modifier = cellModifier
                 ) { innerTextField ->
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally
@@ -148,6 +196,16 @@ fun PincodeView(
                         )
                     }
                 }
+
+
+                DropdownMenu(
+                    expanded = dropDownExpanded,
+                    onDismissRequest = { /*TODO*/ }
+                ) {
+                    DropdownMenuItem(onClick = { dropDownExpanded = false }) {
+                        Text("Paste")
+                    }
+                }
                 if (i + 1 == showDividerAfterInput) {
                     DividerWithSpacerStart(inputSpacing, dividerColor, dividerModifier)
                 }
@@ -167,6 +225,16 @@ fun PincodeView(
         }
     }
 }
+
+private fun Modifier.disableClickable(): Modifier =
+    composed {
+        clickable(
+            enabled = false,
+            indication = null,
+            interactionSource = remember { MutableInteractionSource() },
+            onClick = { }
+        )
+    }
 
 @Composable
 private fun DividerWithSpacerStart(
