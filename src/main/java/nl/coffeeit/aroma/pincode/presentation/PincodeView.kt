@@ -87,9 +87,9 @@ fun PincodeView(
     onlyDigits: Boolean = true,
     autoFocusFirstInput: Boolean = false,
     // TODO: Should be adaptable later on when PincodeView is already instantiated
-    pincode: String = ""
+    pincode: String = "",
+    actionBack: () -> Unit = { }
 ) {
-    var mutablePincode by remember { mutableStateOf(pincode) }
     val enteredValues by remember {
         mutableStateOf(mutableListOf<PincodeItem>().apply {
             for (i in 0 until lengthOfCode) {
@@ -97,6 +97,7 @@ fun PincodeView(
             }
         })
     }
+    var mutablePincode by remember { mutableStateOf(pincode) }
 
     Column(
         modifier = modifier
@@ -174,6 +175,10 @@ fun PincodeView(
                             if (!isFirstInput) {
                                 focusManager.moveFocus(FocusDirection.Left)
                             }
+                        }
+
+                        if (it.key == Key.Back) {
+                            actionBack()
                         }
                         return@onKeyEvent true
                     }
