@@ -1,9 +1,6 @@
 package nl.coffeeit.aroma.pincode.presentation
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,7 +12,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
@@ -23,18 +19,15 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import nl.coffeeit.aroma.pincode.domain.model.PincodeItem
 import nl.coffeeit.aroma.pincode.extension.digits
 import nl.coffeeit.aroma.pincode.extension.digitsAndLetters
 
@@ -69,6 +62,7 @@ fun PincodeView(
     dividerHeight: Dp = 2.dp,
     dividerWidth: Dp = 6.dp,
     modifier: Modifier = Modifier.padding(horizontal = 16.dp),
+    // TODO: Should be adaptable later on when PincodeView is already instantiated
     isError: Boolean = false,
     errorText: String? = null,
     errorLabelPaddingVertical: Dp = 8.dp,
@@ -85,21 +79,25 @@ fun PincodeView(
     errorLabelTextStyle: TextStyle = TextStyle(
         color = DefaultErrorColor
     ),
-    onlyDigits: Boolean = true
+    onlyDigits: Boolean = true,
+    // TODO: Should be adaptable later on when PincodeView is already instantiated
+    pincode: String = ""
 ) {
+    var mutablePincode by remember { mutableStateOf(pincode) }
+    val enteredValues by remember {
+        mutableStateOf(mutableListOf<PincodeItem>().apply {
+            for (i in 0 until lengthOfCode) {
+                add(PincodeItem(i, ""))
+            }
+        })
+    }
+
     Column(
         modifier = modifier
     ) {
-        var dropDownExpanded by remember { mutableStateOf(false) }
-
         Row(
             Modifier
                 .fillMaxWidth()
-                .pointerInput(Unit) {
-                    detectTapGestures(
-                        onLongPress = { dropDownExpanded = true }
-                    )
-                }
         ) {
             val dividerModifier = Modifier
                 .height(dividerHeight)
@@ -115,14 +113,30 @@ fun PincodeView(
             }
 
             for (i in 0 until lengthOfCode) {
-                // TODO: Remove isError check from pincodeCharacter default value, is only for visual check of error state
-                var pincodeCharacter by remember { mutableStateOf(if (isError) "1" else "") }
-                val interactionSource = remember { MutableInteractionSource() }
-
-                val focusManager = LocalFocusManager.current
                 val clipboardManager = LocalClipboardManager.current
-                val isLastField = i == lengthOfCode - 1
+                val focusManager = LocalFocusManager.current
+                val interactionSource = remember { MutableInteractionSource() }
                 val isFirstField = i == 0
+                val isLastField = i == lengthOfCode - 1
+                var pincodeCharacterTextFieldValue by remember { mutableStateOf(TextFieldValue("")) }
+
+                // Fill out pincode from parameters or from pasted value
+                if (mutablePincode.isNotEmpty()) {
+
+                    // Add next character and remove it from the total string
+                    val character = mutablePincode.substring(0, 1)
+                    mutablePincode = mutablePincode.drop(1)
+                    val validatedText =
+                        if (onlyDigits) character.digits() else character.digitsAndLetters()
+                    pincodeCharacterTextFieldValue = TextFieldValue(validatedText)
+                    enteredValues.find { pincodeItem -> pincodeItem.index == i }?.text = validatedText
+
+                    // Move focus to next input if current input is not the last input and the total string
+                    // is not empty yet
+                    if (mutablePincode.isNotEmpty() && !isLastField) {
+                        focusManager.moveFocus(FocusDirection.Right)
+                    }
+                }
 
                 val cellModifier = if (inputWidth != null) {
                     Modifier
@@ -140,22 +154,83 @@ fun PincodeView(
                         shape = inputCornerShape
                     )
                     .onKeyEvent {
-                        if (it.key == Key.Backspace && !isFirstField) {
-                            focusManager.moveFocus(FocusDirection.Left)
+                        // Clear pincode from parameters or from pasted value when a key is pressed
+                        mutablePincode = ""
+
+                        // If pressed key is backspace, remove value from input and clear the value in the list
+                        if (it.key == Key.Backspace) {
+                            pincodeCharacterTextFieldValue = TextFieldValue("")
+                            enteredValues.find { pincodeItem -> pincodeItem.index == i }?.text = ""
+
+                            // Move focus to previous input if current input is not the first input
+                            if (!isFirstField) {
+                                focusManager.moveFocus(FocusDirection.Left)
+                            }
                         }
                         return@onKeyEvent true
                     }
 
                 BasicTextField(
-                    value = pincodeCharacter,
-                    onValueChange = { text ->
-                        // TODO: Spread pasted text over text fields (println can be removed after doing so)
-                        println("This is the pasted text: $text")
-                        if (text.length <= MAXIMUM_AMOUNT_OF_CHARACTERS_PER_INPUT) {
-                            val validatedText = if (onlyDigits) text.digits() else text.digitsAndLetters()
-                            pincodeCharacter = validatedText
-                            if (validatedText.isNotEmpty() && !isLastField) {
-                                focusManager.moveFocus(FocusDirection.Right)
+                    value = pincodeCharacterTextFieldValue,
+                    onValueChange = { textFieldValue ->
+                        var text = textFieldValue.text
+
+                        // The previous value should be removed, so the new value can overwrite it
+                        enteredValues.find { it.index == i }?.text?.let { pincodeItemText ->
+                            if (pincodeItemText.isNotEmpty()) {
+                                text = text.removeRange(
+                                    text.lastIndexOf(pincodeItemText),
+                                    text.lastIndexOf(pincodeItemText) + 1
+                                )
+                            }
+                        }
+
+                        // Only handle the change when the text changed
+                        if (enteredValues.find { enteredValue -> enteredValue.index == i }?.text != textFieldValue.text) {
+
+                            // Check if the value is the same as the copied text
+                            if (text == clipboardManager.getText()?.text) {
+                                mutablePincode =
+                                    if (onlyDigits) text.digits() else text.digitsAndLetters()
+
+                                // If the pasted value is longer than the length of the code, cut all
+                                // characters that exceed the length off
+                                if (mutablePincode.length > lengthOfCode) {
+                                    mutablePincode = mutablePincode.substring(0, lengthOfCode)
+                                }
+
+                                // Request focus on the first input
+                                for (j in 1..i) {
+                                    focusManager.moveFocus(FocusDirection.Left)
+                                }
+                            } else {
+                                // Add single character to input
+
+                                var validatedText =
+                                    if (onlyDigits) text.digits() else text.digitsAndLetters()
+
+                                // It is possible that two or more characters or more are potentially added, for example
+                                // when spamming the keyboard. To prevent multiple characters from being added, only the first
+                                // character is used
+                                if (validatedText.length > MAXIMUM_AMOUNT_OF_CHARACTERS_PER_INPUT) {
+                                    validatedText = validatedText.substring(0, 1)
+                                }
+
+                                // Place the value in the input if it's shorter than or has the same size as the maximum
+                                // amount of characters per input
+                                if (validatedText.length <= MAXIMUM_AMOUNT_OF_CHARACTERS_PER_INPUT) {
+                                    pincodeCharacterTextFieldValue = TextFieldValue(validatedText)
+
+                                    // Move focus to next input if the current input is not the
+                                    // last input and value is not empty
+                                    if (validatedText.isNotEmpty() && !isLastField) {
+                                        focusManager.moveFocus(FocusDirection.Right)
+                                    }
+
+                                    // Save the entered value in the list
+                                    enteredValues.find { pincodeItem -> pincodeItem.index == i }?.text =
+                                        validatedText
+                                }
                             }
                         }
                     },
@@ -180,7 +255,7 @@ fun PincodeView(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         TextFieldDefaults.OutlinedTextFieldDecorationBox(
-                            value = pincodeCharacter,
+                            value = pincodeCharacterTextFieldValue.text,
                             visualTransformation = VisualTransformation.None,
                             innerTextField = innerTextField,
                             singleLine = true,
@@ -198,21 +273,11 @@ fun PincodeView(
                                     interactionSource = interactionSource,
                                     colors = inputColors,
                                     shape = inputCornerShape,
-                                    // TODO: Maybe make border thickness configurable
                                     unfocusedBorderThickness = unfocusedBorderThickness,
                                     focusedBorderThickness = focusedBorderThickness
                                 )
                             }
                         )
-                    }
-                }
-
-                DropdownMenu(
-                    expanded = dropDownExpanded,
-                    onDismissRequest = { /*TODO*/ }
-                ) {
-                    DropdownMenuItem(onClick = { dropDownExpanded = false }) {
-                        Text("Paste")
                     }
                 }
 
@@ -235,16 +300,6 @@ fun PincodeView(
         }
     }
 }
-
-private fun Modifier.disableClickable(): Modifier =
-    composed {
-        clickable(
-            enabled = false,
-            indication = null,
-            interactionSource = remember { MutableInteractionSource() },
-            onClick = { }
-        )
-    }
 
 @Composable
 private fun DividerWithSpacerStart(
