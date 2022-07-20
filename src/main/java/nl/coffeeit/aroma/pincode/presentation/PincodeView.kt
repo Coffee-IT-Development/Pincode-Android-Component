@@ -13,6 +13,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
@@ -21,18 +23,21 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 import nl.coffeeit.aroma.pincode.domain.model.PincodeItem
 import nl.coffeeit.aroma.pincode.extension.digits
 import nl.coffeeit.aroma.pincode.extension.digitsAndLetters
 
 private const val DEFAULT_CORNER_RADIUS = 8
 private const val DEFAULT_LENGTH_OF_CODE = 6
+private const val KEYBOARD_OPEN_DELAY_IN_MILLIS = 100L
 private const val MAXIMUM_AMOUNT_OF_CHARACTERS_PER_INPUT = 1
 
 private val DefaultBackgroundColor = Color(0xFFF6F6F6)
@@ -80,6 +85,7 @@ fun PincodeView(
         color = DefaultErrorColor
     ),
     onlyDigits: Boolean = true,
+    autoFocusFirstInput: Boolean = false,
     // TODO: Should be adaptable later on when PincodeView is already instantiated
     pincode: String = ""
 ) {
@@ -115,9 +121,11 @@ fun PincodeView(
             for (i in 0 until lengthOfCode) {
                 val clipboardManager = LocalClipboardManager.current
                 val focusManager = LocalFocusManager.current
+                val focusRequester = remember { FocusRequester() }
                 val interactionSource = remember { MutableInteractionSource() }
-                val isFirstField = i == 0
-                val isLastField = i == lengthOfCode - 1
+                val isFirstInput = i == 0
+                val isLastInput = i == lengthOfCode - 1
+                val keyboard = LocalSoftwareKeyboardController.current
                 var pincodeCharacterTextFieldValue by remember { mutableStateOf(TextFieldValue("")) }
 
                 // Fill out pincode from parameters or from pasted value
@@ -133,7 +141,7 @@ fun PincodeView(
 
                     // Move focus to next input if current input is not the last input and the total string
                     // is not empty yet
-                    if (mutablePincode.isNotEmpty() && !isLastField) {
+                    if (mutablePincode.isNotEmpty() && !isLastInput) {
                         focusManager.moveFocus(FocusDirection.Right)
                     }
                 }
@@ -163,12 +171,13 @@ fun PincodeView(
                             enteredValues.find { pincodeItem -> pincodeItem.index == i }?.text = ""
 
                             // Move focus to previous input if current input is not the first input
-                            if (!isFirstField) {
+                            if (!isFirstInput) {
                                 focusManager.moveFocus(FocusDirection.Left)
                             }
                         }
                         return@onKeyEvent true
                     }
+                    .focusRequester(focusRequester)
 
                 BasicTextField(
                     value = pincodeCharacterTextFieldValue,
@@ -223,7 +232,7 @@ fun PincodeView(
 
                                     // Move focus to next input if the current input is not the
                                     // last input and value is not empty
-                                    if (validatedText.isNotEmpty() && !isLastField) {
+                                    if (validatedText.isNotEmpty() && !isLastInput) {
                                         focusManager.moveFocus(FocusDirection.Right)
                                     }
 
@@ -236,7 +245,7 @@ fun PincodeView(
                     },
                     keyboardOptions = KeyboardOptions(
                         capitalization = KeyboardCapitalization.Characters,
-                        imeAction = if (isLastField) ImeAction.Done else ImeAction.Next,
+                        imeAction = if (isLastInput) ImeAction.Done else ImeAction.Next,
                         autoCorrect = false,
                         keyboardType = if (onlyDigits) KeyboardType.Number else KeyboardType.Text
                     ),
@@ -278,6 +287,15 @@ fun PincodeView(
                                 )
                             }
                         )
+                    }
+                }
+
+                if (autoFocusFirstInput && isFirstInput) {
+                LaunchedEffect(focusRequester) {
+                        focusRequester.requestFocus()
+                        // Add a delay, otherwise the keyboard doesn't open
+                        delay(KEYBOARD_OPEN_DELAY_IN_MILLIS)
+                        keyboard?.show()
                     }
                 }
 
