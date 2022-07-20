@@ -9,6 +9,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -30,6 +31,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.delay
 import nl.coffeeit.aroma.pincode.domain.model.PincodeItem
 import nl.coffeeit.aroma.pincode.extension.digits
@@ -67,8 +70,6 @@ fun PincodeView(
     dividerHeight: Dp = 2.dp,
     dividerWidth: Dp = 6.dp,
     modifier: Modifier = Modifier.padding(horizontal = 16.dp),
-    // TODO: Should be adaptable later on when PincodeView is already instantiated
-    isError: Boolean = false,
     errorText: String? = null,
     errorLabelPaddingVertical: Dp = 8.dp,
     focusedBorderThickness: Dp = 1.dp,
@@ -86,10 +87,15 @@ fun PincodeView(
     ),
     onlyDigits: Boolean = true,
     autoFocusFirstInput: Boolean = false,
-    // TODO: Should be adaptable later on when PincodeView is already instantiated
-    pincode: String = "",
-    actionBack: () -> Unit = { }
+    pincodeLiveData: LiveData<String>,
+    isErrorLiveData: LiveData<Boolean>,
+    resetPincodeLiveData: () -> Unit = { },
+    onBack: () -> Unit = { },
+    onPincodeCompleted: (String?) -> Unit = { }
 ) {
+    val isError: Boolean? by isErrorLiveData.observeAsState()
+    val pincode: String? by pincodeLiveData.observeAsState()
+
     val enteredValues by remember {
         mutableStateOf(mutableListOf<PincodeItem>().apply {
             for (i in 0 until lengthOfCode) {
@@ -130,19 +136,26 @@ fun PincodeView(
                 var pincodeCharacterTextFieldValue by remember { mutableStateOf(TextFieldValue("")) }
 
                 // Fill out pincode from parameters or from pasted value
-                if (mutablePincode.isNotEmpty()) {
+                if (mutablePincode?.isNotEmpty() == true) {
 
                     // Add next character and remove it from the total string
-                    val character = mutablePincode.substring(0, 1)
-                    mutablePincode = mutablePincode.drop(1)
-                    val validatedText =
-                        if (onlyDigits) character.digits() else character.digitsAndLetters()
-                    pincodeCharacterTextFieldValue = TextFieldValue(validatedText)
-                    enteredValues.find { pincodeItem -> pincodeItem.index == i }?.text = validatedText
+                    val character = mutablePincode?.substring(0, 1)
+                    mutablePincode = mutablePincode?.drop(1)
+                    (if (onlyDigits) character?.digits() else character?.digitsAndLetters())?.let { validatedText ->
+                        pincodeCharacterTextFieldValue = TextFieldValue(validatedText)
+                        enteredValues.find { pincodeItem -> pincodeItem.index == i }?.text = validatedText
+
+                        // Send code back to parent composable if this is the last input and it's not empty
+                        if (validatedText.isNotEmpty() && isLastInput) {
+                            val completedPincode =
+                                enteredValues.joinToString("") { pincodeItem -> pincodeItem.text }
+                            onPincodeCompleted(completedPincode)
+                        }
+                    }
 
                     // Move focus to next input if current input is not the last input and the total string
                     // is not empty yet
-                    if (mutablePincode.isNotEmpty() && !isLastInput) {
+                    if (mutablePincode?.isNotEmpty() == true && !isLastInput) {
                         focusManager.moveFocus(FocusDirection.Right)
                     }
                 }
@@ -178,7 +191,7 @@ fun PincodeView(
                         }
 
                         if (it.key == Key.Back) {
-                            actionBack()
+                            onBack()
                         }
                         return@onKeyEvent true
                     }
@@ -201,7 +214,7 @@ fun PincodeView(
 
                         // Only handle the change when the text changed
                         if (enteredValues.find { enteredValue -> enteredValue.index == i }?.text != textFieldValue.text) {
-
+                            
                             // Check if the value is the same as the copied text
                             if (text == clipboardManager.getText()?.text) {
                                 mutablePincode =
@@ -209,8 +222,8 @@ fun PincodeView(
 
                                 // If the pasted value is longer than the length of the code, cut all
                                 // characters that exceed the length off
-                                if (mutablePincode.length > lengthOfCode) {
-                                    mutablePincode = mutablePincode.substring(0, lengthOfCode)
+                                if (mutablePincode?.length ?: 0 > lengthOfCode) {
+                                    mutablePincode = mutablePincode?.substring(0, lengthOfCode)
                                 }
 
                                 // Request focus on the first input
@@ -244,6 +257,13 @@ fun PincodeView(
                                     // Save the entered value in the list
                                     enteredValues.find { pincodeItem -> pincodeItem.index == i }?.text =
                                         validatedText
+
+                                    // Send code back to parent composable if this is the last input and it's not empty
+                                    if (validatedText.isNotEmpty() && isLastInput) {
+                                        val completedPincode =
+                                            enteredValues.joinToString("") { pincodeItem -> pincodeItem.text }
+                                        onPincodeCompleted(completedPincode)
+                                    }
                                 }
                             }
                         }
@@ -260,9 +280,9 @@ fun PincodeView(
                     ),
                     singleLine = true,
                     maxLines = 1,
-                    textStyle = if (isError) inputErrorTextStyle else inputTextStyle,
+                    textStyle = if (isError == true) inputErrorTextStyle else inputTextStyle,
                     interactionSource = interactionSource,
-                    cursorBrush = SolidColor(inputColors.cursorColor(isError = isError).value),
+                    cursorBrush = SolidColor(inputColors.cursorColor(isError = isError == true).value),
                     modifier = cellModifier
                 ) { innerTextField ->
                     Column(
@@ -278,12 +298,12 @@ fun PincodeView(
                                 start = 0.dp,
                                 end = 0.dp
                             ),
-                            isError = isError,
+                            isError = isError == true,
                             interactionSource = interactionSource,
                             border = {
                                 TextFieldDefaults.BorderBox(
                                     enabled = true,
-                                    isError = isError,
+                                    isError = isError == true,
                                     interactionSource = interactionSource,
                                     colors = inputColors,
                                     shape = inputCornerShape,
@@ -314,7 +334,10 @@ fun PincodeView(
             }
         }
 
-        if (isError && errorText != null) {
+        mutablePincode = pincode
+        resetPincodeLiveData()
+
+        if (isError == true && errorText != null) {
             Text(
                 text = errorText,
                 style = errorLabelTextStyle,
@@ -353,5 +376,11 @@ private fun DividerWithSpacerEnd(
 @Composable
 @Preview(showBackground = true)
 fun ModalPincodeViewPreview() {
-    PincodeView()
+    val isError = MutableLiveData<Boolean>()
+    val pincode = MutableLiveData<String>()
+
+    PincodeView(
+        pincodeLiveData = pincode,
+        isErrorLiveData = isError
+    )
 }
