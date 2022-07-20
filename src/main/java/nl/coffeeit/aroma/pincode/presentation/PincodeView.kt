@@ -1,5 +1,6 @@
 package nl.coffeeit.aroma.pincode.presentation
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -27,12 +28,15 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import nl.coffeeit.aroma.pincode.extension.digits
+import nl.coffeeit.aroma.pincode.extension.digitsAndLetters
 
 private const val DEFAULT_CORNER_RADIUS = 8
 private const val DEFAULT_LENGTH_OF_CODE = 6
@@ -80,7 +84,8 @@ fun PincodeView(
     ),
     errorLabelTextStyle: TextStyle = TextStyle(
         color = DefaultErrorColor
-    )
+    ),
+    onlyDigits: Boolean = true
 ) {
     Column(
         modifier = modifier
@@ -116,8 +121,8 @@ fun PincodeView(
 
                 val focusManager = LocalFocusManager.current
                 val clipboardManager = LocalClipboardManager.current
-                val isLastField = (i == lengthOfCode - 1)
-                val isFirstField = (i == 0)
+                val isLastField = i == lengthOfCode - 1
+                val isFirstField = i == 0
 
                 val cellModifier = if (inputWidth != null) {
                     Modifier
@@ -143,17 +148,22 @@ fun PincodeView(
 
                 BasicTextField(
                     value = pincodeCharacter,
-                    onValueChange = {
-                        if (it.length <= MAXIMUM_AMOUNT_OF_CHARACTERS_PER_INPUT) {
-                            pincodeCharacter = it
-                            if (it.isNotEmpty() && !isLastField) {
+                    onValueChange = { text ->
+                        // TODO: Spread pasted text over text fields (println can be removed after doing so)
+                        println("This is the pasted text: $text")
+                        if (text.length <= MAXIMUM_AMOUNT_OF_CHARACTERS_PER_INPUT) {
+                            val validatedText = if (onlyDigits) text.digits() else text.digitsAndLetters()
+                            pincodeCharacter = validatedText
+                            if (validatedText.isNotEmpty() && !isLastField) {
                                 focusManager.moveFocus(FocusDirection.Right)
                             }
                         }
                     },
                     keyboardOptions = KeyboardOptions(
+                        capitalization = KeyboardCapitalization.Characters,
                         imeAction = if (isLastField) ImeAction.Done else ImeAction.Next,
-                        keyboardType = KeyboardType.Number
+                        autoCorrect = false,
+                        keyboardType = if (onlyDigits) KeyboardType.Number else KeyboardType.Text
                     ),
                     keyboardActions = KeyboardActions(
                         onNext = { focusManager.moveFocus(FocusDirection.Right) },
@@ -197,7 +207,6 @@ fun PincodeView(
                     }
                 }
 
-
                 DropdownMenu(
                     expanded = dropDownExpanded,
                     onDismissRequest = { /*TODO*/ }
@@ -206,6 +215,7 @@ fun PincodeView(
                         Text("Paste")
                     }
                 }
+
                 if (i + 1 == showDividerAfterInput) {
                     DividerWithSpacerStart(inputSpacing, dividerColor, dividerModifier)
                 }
