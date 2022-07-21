@@ -133,6 +133,14 @@ fun PincodeView(
                 val isFirstInput = i == 0
                 val isLastInput = i == lengthOfCode - 1
                 val keyboard = LocalSoftwareKeyboardController.current
+                // Use TextFieldValue instead of String to prevent the character replacement bug from happening.
+                // This bug happens when a character is added to an input when the cursor is in a position
+                // that is not 0. In this case, onValueChanged will receive the character that was already
+                // in the input twice. For example, if there is "W" in the input and "2" is added,
+                // onValueChanged will receive "WW", while "W2" or "2W" is expected. TextFieldValue
+                // sets the selection (position of the cursor) to 0 by default. In the same example
+                // this means that when there is "W" in the input and "2" is added, onValueChanged will
+                // now receive "2W".
                 var pincodeCharacterTextFieldValue by remember { mutableStateOf(TextFieldValue("")) }
 
                 // Fill out pincode from parameters or from pasted value
