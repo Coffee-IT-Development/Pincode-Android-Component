@@ -222,7 +222,7 @@ fun PincodeView(
 
                                 // If the pasted value is longer than the length of the code, cut all
                                 // characters that exceed the length off
-                                if (mutablePincode?.length ?: 0 > lengthOfCode) {
+                                if ((mutablePincode?.length ?: 0) > lengthOfCode) {
                                     mutablePincode = mutablePincode?.substring(0, lengthOfCode)
                                 }
 
