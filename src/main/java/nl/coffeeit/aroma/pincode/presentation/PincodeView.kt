@@ -19,11 +19,13 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.*
@@ -107,7 +109,13 @@ fun PincodeView(
             }
         })
     }
+
     var mutablePincode by remember { mutableStateOf(pincode) }
+    val haptic = LocalHapticFeedback.current
+    val clipboardManager = LocalClipboardManager.current
+    val focusManager = LocalFocusManager.current
+    val focusRequester = remember { FocusRequester() }
+    val keyboard = LocalSoftwareKeyboardController.current
 
     Column(
         modifier = modifier
@@ -130,13 +138,9 @@ fun PincodeView(
             }
 
             for (i in 0 until lengthOfCode) {
-                val clipboardManager = LocalClipboardManager.current
-                val focusManager = LocalFocusManager.current
-                val focusRequester = remember { FocusRequester() }
                 val interactionSource = remember { MutableInteractionSource() }
                 val isFirstInput = i == 0
                 val isLastInput = i == lengthOfCode - 1
-                val keyboard = LocalSoftwareKeyboardController.current
                 // Use TextFieldValue instead of String to prevent the character replacement bug from happening.
                 // This bug happens when a character is added to an input when the cursor is in a position
                 // that is not 0. In this case, onValueChanged will receive the character that was already
@@ -159,7 +163,7 @@ fun PincodeView(
 
                         // Send code back to parent composable if this is the last input and it's not empty
                         if (validatedText.isNotEmpty() && isLastInput) {
-                            val completedPincode =
+                             val completedPincode =
                                 enteredValues.joinToString("") { pincodeItem -> pincodeItem.text }
                             onPincodeCompleted(completedPincode)
                         }
@@ -362,6 +366,8 @@ fun PincodeView(
                 style = errorLabelTextStyle,
                 modifier = Modifier.padding(vertical = errorLabelPaddingVertical)
             )
+            // TODO: Check where haptic feedback onError should be
+            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
         }
     }
 }
