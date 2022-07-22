@@ -42,6 +42,7 @@ private const val DEFAULT_CORNER_RADIUS = 8
 private const val DEFAULT_LENGTH_OF_CODE = 6
 private const val KEYBOARD_OPEN_DELAY_IN_MILLIS = 100L
 private const val MAXIMUM_AMOUNT_OF_CHARACTERS_PER_INPUT = 1
+private const val DefaultResendButtonText = "Send code again"
 
 private val DefaultBackgroundColor = Color(0xFFF6F6F6)
 private val DefaultDividerColor = Color(0xFF625b71)
@@ -91,7 +92,10 @@ fun PincodeView(
     isErrorLiveData: LiveData<Boolean>,
     resetPincodeLiveData: () -> Unit = { },
     onBack: () -> Unit = { },
-    onPincodeCompleted: (String?) -> Unit = { }
+    onPincodeCompleted: (String?) -> Unit = { },
+    enableResendButton: Boolean = false,
+    resendButtonText: String = DefaultResendButtonText,
+    onResendButton: () -> Unit = { }
 ) {
     val isError: Boolean? by isErrorLiveData.observeAsState()
     val pincode: String? by pincodeLiveData.observeAsState()
@@ -104,6 +108,9 @@ fun PincodeView(
         })
     }
     var mutablePincode by remember { mutableStateOf(pincode) }
+
+    var mutableResendButtonText by remember { mutableStateOf(resendButtonText) }
+    var mutableResendTicks by remember { mutableStateOf(60) }
 
     Column(
         modifier = modifier
@@ -340,6 +347,14 @@ fun PincodeView(
                     Spacer(modifier = Modifier.width(inputSpacing))
                 }
             }
+        }
+
+        if (enableResendButton) {
+            ResendButton(
+                totalTime = 10,
+                onResendButton = onResendButton,
+                resendButtonText = resendButtonText
+            )
         }
 
         mutablePincode = pincode
