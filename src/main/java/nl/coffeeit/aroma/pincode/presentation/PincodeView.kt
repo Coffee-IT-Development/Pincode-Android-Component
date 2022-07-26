@@ -28,6 +28,10 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,21 +40,79 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.delay
+import nl.coffeeit.aroma.pincode.R
 import nl.coffeeit.aroma.pincode.domain.model.PincodeItem
 import nl.coffeeit.aroma.pincode.extension.digits
 import nl.coffeeit.aroma.pincode.extension.digitsAndLetters
 
+internal const val DEFAULT_RESEND_COOLDOWN_DURATION = 60
 private const val DEFAULT_CORNER_RADIUS = 8
 private const val DEFAULT_LENGTH_OF_CODE = 6
 private const val KEYBOARD_OPEN_DELAY_IN_MILLIS = 100L
 private const val MAXIMUM_AMOUNT_OF_CHARACTERS_PER_INPUT = 1
 
+internal val DefaultResendButtonConfiguration = ResendButtonConfiguration()
+internal val DefaultResendButtonConfigurationDisabled = ResendButtonConfiguration()
 private val DefaultBackgroundColor = Color(0xFFF6F6F6)
 private val DefaultDividerColor = Color(0xFF625b71)
 private val DefaultErrorColor = Color(0xFFF7694A)
 private val DefaultFocusedBorderColor = Color(0xFF6650a4)
 private val DefaultUnfocusedBorderColor = Color(0xFF625b71)
-private val DefaultResendButtonStyle = ResendButtonStyle()
+private val DefaultFontFamily = FontFamily(
+    Font(R.font.roboto_thin, FontWeight.Thin),
+    Font(R.font.roboto_thin_italic, FontWeight.Thin, FontStyle.Italic),
+    Font(R.font.roboto_light, FontWeight.Light),
+    Font(R.font.roboto_light_italic, FontWeight.Light, FontStyle.Italic),
+    Font(R.font.roboto_regular, FontWeight.Normal),
+    Font(R.font.roboto_italic, FontWeight.Normal, FontStyle.Italic),
+    Font(R.font.roboto_medium, FontWeight.Medium),
+    Font(R.font.roboto_medium_italic, FontWeight.Medium, FontStyle.Italic),
+    Font(R.font.roboto_bold, FontWeight.Bold),
+    Font(R.font.roboto_bold_italic, FontWeight.Bold, FontStyle.Italic),
+    Font(R.font.roboto_black, FontWeight.Black),
+    Font(R.font.roboto_black_italic, FontWeight.Black, FontStyle.Italic)
+)
+private val DefaultFontStyleInput = FontStyle.Normal
+private val DefaultFontStyleResendButton = FontStyle.Normal
+private val DefaultFontWeightResendButton = FontWeight.Normal
+private val DefaultFontWeightInput = FontWeight.Normal
+private val DefaultResendButtonBackgroundColor = Color(0xFF6650a4)
+private val DefaultResendButtonBackgroundDisabledColor = Color(0x806650A4)
+
+private val DefaultInputTextStyle: TextStyle = TextStyle(
+    textAlign = TextAlign.Center,
+    color = Color.Black,
+    fontFamily = DefaultFontFamily,
+    fontWeight = DefaultFontWeightInput,
+    fontStyle = DefaultFontStyleInput
+)
+private val DefaultInputErrorTextStyle: TextStyle = TextStyle(
+    textAlign = TextAlign.Center,
+    color = Color.Black,
+    fontFamily = DefaultFontFamily,
+    fontWeight = DefaultFontWeightInput,
+    fontStyle = DefaultFontStyleInput
+)
+private val DefaultErrorLabelTextStyle: TextStyle = TextStyle(
+    color = DefaultErrorColor,
+    fontFamily = DefaultFontFamily,
+    fontWeight = DefaultFontWeightInput,
+    fontStyle = DefaultFontStyleInput
+)
+internal val DefaultResendButtonTextStyle: TextStyle = TextStyle(
+    color = Color.White,
+    background = DefaultResendButtonBackgroundColor,
+    fontFamily = DefaultFontFamily,
+    fontWeight = DefaultFontWeightResendButton,
+    fontStyle = DefaultFontStyleResendButton
+)
+internal val DefaultResendButtonDisabledTextStyle: TextStyle = TextStyle(
+    color = Color.White,
+    background = DefaultResendButtonBackgroundDisabledColor,
+    fontFamily = DefaultFontFamily,
+    fontWeight = DefaultFontWeightResendButton,
+    fontStyle = DefaultFontStyleResendButton
+)
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
 @Composable
@@ -77,17 +139,11 @@ fun PincodeView(
     errorLabelPaddingVertical: Dp = 8.dp,
     focusedBorderThickness: Dp = 1.dp,
     unfocusedBorderThickness: Dp = 1.dp,
-    inputTextStyle: TextStyle = TextStyle(
-        textAlign = TextAlign.Center,
-        color = Color.Black
-    ),
-    inputErrorTextStyle: TextStyle = TextStyle(
-        textAlign = TextAlign.Center,
-        color = Color.Black
-    ),
-    errorLabelTextStyle: TextStyle = TextStyle(
-        color = DefaultErrorColor
-    ),
+    inputTextStyle: TextStyle = DefaultInputTextStyle,
+    inputErrorTextStyle: TextStyle = DefaultInputErrorTextStyle,
+    errorLabelTextStyle: TextStyle = DefaultErrorLabelTextStyle,
+    resendButtonTextStyle: TextStyle = DefaultResendButtonTextStyle,
+    resendButtonDisabledTextStyle: TextStyle = DefaultResendButtonDisabledTextStyle,
     onlyDigits: Boolean = true,
     autoFocusFirstInput: Boolean = false,
     pincodeLiveData: LiveData<String>,
@@ -96,8 +152,11 @@ fun PincodeView(
     onBack: () -> Unit = { },
     onPincodeCompleted: (String?) -> Unit = { },
     enableResendButton: Boolean = false,
-    resendButtonStyle: ResendButtonStyle = DefaultResendButtonStyle,
-    onResendButton: () -> Unit = { }
+    resendButtonConfiguration: ResendButtonConfiguration = DefaultResendButtonConfiguration,
+    resendButtonConfigurationDisabled: ResendButtonConfiguration = DefaultResendButtonConfigurationDisabled,
+    resendCooldownDuration: Int = DEFAULT_RESEND_COOLDOWN_DURATION,
+    onResend: () -> Unit = { },
+    keyEventInErrorState: () -> Unit = { },
 ) {
     val isError: Boolean? by isErrorLiveData.observeAsState()
     val pincode: String? by pincodeLiveData.observeAsState()
@@ -111,11 +170,10 @@ fun PincodeView(
     }
 
     var mutablePincode by remember { mutableStateOf(pincode) }
-    val haptic = LocalHapticFeedback.current
+    val hapticFeedback = LocalHapticFeedback.current
     val clipboardManager = LocalClipboardManager.current
     val focusManager = LocalFocusManager.current
-    val focusRequester = remember { FocusRequester() }
-    val keyboard = LocalSoftwareKeyboardController.current
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     Column(
         modifier = modifier
@@ -138,6 +196,7 @@ fun PincodeView(
             }
 
             for (i in 0 until lengthOfCode) {
+                val focusRequester = remember { FocusRequester() }
                 val interactionSource = remember { MutableInteractionSource() }
                 val isFirstInput = i == 0
                 val isLastInput = i == lengthOfCode - 1
@@ -194,6 +253,11 @@ fun PincodeView(
                     .onKeyEvent {
                         // Clear pincode from parameters or from pasted value when a key is pressed
                         mutablePincode = ""
+
+                        // Invoke event when a key event is received while isError is true
+                        if (isError == true) {
+                            keyEventInErrorState()
+                        }
 
                         // If pressed key is backspace, remove value from input and clear the value in the list
                         if (it.key == Key.Backspace) {
@@ -336,7 +400,7 @@ fun PincodeView(
                         focusRequester.requestFocus()
                         // Add a delay, otherwise the keyboard doesn't open
                         delay(KEYBOARD_OPEN_DELAY_IN_MILLIS)
-                        keyboard?.show()
+                    keyboardController?.show()
                     }
                 }
 
@@ -351,9 +415,15 @@ fun PincodeView(
         }
 
         if (enableResendButton) {
+            Spacer(modifier = Modifier.height(16.dp))
+
             ResendButton(
-                onResendButton = onResendButton,
-                buttonStyle = resendButtonStyle
+                resendCooldownDuration = resendCooldownDuration,
+                onResend = onResend,
+                buttonConfiguration = resendButtonConfiguration,
+                buttonConfigurationDisabled = resendButtonConfigurationDisabled,
+                textStyle = resendButtonTextStyle,
+                disabledTextStyle = resendButtonDisabledTextStyle
             )
         }
 
@@ -367,7 +437,7 @@ fun PincodeView(
                 modifier = Modifier.padding(vertical = errorLabelPaddingVertical)
             )
             // TODO: Check where haptic feedback onError should be
-            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
         }
     }
 }

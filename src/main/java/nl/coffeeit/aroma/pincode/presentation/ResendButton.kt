@@ -9,75 +9,82 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import java.util.concurrent.TimeUnit
 
 private const val DEFAULT_RESEND_BUTTON_TEXT = "Send code again"
 private const val DEFAULT_CORNER_RADIUS = 16
-private const val DEFAULT_TIME_BEFORE_RESEND_IN_SECONDS = 60
-
-private val DefaultResendButtonPosition = ResendButtonStyle.ButtonPosition.START
 
 @Composable
 fun ResendButton(
-    totalTime: Int = DEFAULT_TIME_BEFORE_RESEND_IN_SECONDS,
-    onResendButton: () -> Unit,
-    buttonStyle: ResendButtonStyle
+    resendCooldownDuration: Int = DEFAULT_RESEND_COOLDOWN_DURATION,
+    onResend: () -> Unit,
+    buttonConfiguration: ResendButtonConfiguration = DefaultResendButtonConfiguration,
+    buttonConfigurationDisabled: ResendButtonConfiguration = DefaultResendButtonConfigurationDisabled,
+    textStyle: TextStyle = DefaultResendButtonTextStyle,
+    disabledTextStyle: TextStyle = DefaultResendButtonDisabledTextStyle,
 ) {
-    var currentTime by remember { mutableStateOf(totalTime) }
+    var currentTime by remember { mutableStateOf(resendCooldownDuration) }
     var isTimerRunning by remember { mutableStateOf(false) }
-    var mutableResendButtonText by remember { mutableStateOf(buttonStyle.text) }
+    var mutableResendButtonText by remember { mutableStateOf(buttonConfiguration.text) }
 
     LaunchedEffect(key1 = currentTime, key2 = isTimerRunning) {
         if (currentTime > 0 && isTimerRunning) {
-            delay(1000)
+            delay(TimeUnit.SECONDS.toMillis(1))
             currentTime -= 1
         } else {
             isTimerRunning = false
-            currentTime = totalTime
+            currentTime = resendCooldownDuration
         }
     }
 
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = when (buttonStyle.alignment) {
-            ResendButtonStyle.ButtonPosition.START -> {
+        horizontalArrangement = when (if (isTimerRunning) buttonConfigurationDisabled.alignment else buttonConfiguration.alignment) {
+            ResendButtonConfiguration.ButtonPosition.START -> {
                 Arrangement.Start
             }
-            ResendButtonStyle.ButtonPosition.END -> {
+            ResendButtonConfiguration.ButtonPosition.END -> {
                 Arrangement.End
             }
         }
     ) {
         Button(
             onClick = {
-                onResendButton()
+                onResend()
                 isTimerRunning = true
+                mutableResendButtonText = buttonConfigurationDisabled.text
             },
-            shape = buttonStyle.cornerShape,
+            shape = if (isTimerRunning) buttonConfigurationDisabled.cornerShape else buttonConfiguration.cornerShape,
             enabled = !isTimerRunning,
-            colors = ButtonDefaults.buttonColors(backgroundColor = buttonStyle.backgroundColor),
-            modifier = (if (isTimerRunning) Modifier.alpha(0.5f) else Modifier)
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = textStyle.background,
+                disabledBackgroundColor = disabledTextStyle.background,
+                contentColor = textStyle.color,
+                disabledContentColor = disabledTextStyle.color
+            ),
         ) {
             Text(
                 text = if (isTimerRunning) {
                     "$mutableResendButtonText ($currentTime)"
-                } else { mutableResendButtonText },
-                color = buttonStyle.textColor
+                } else {
+                    mutableResendButtonText = buttonConfiguration.text
+                    mutableResendButtonText
+                },
+                fontFamily = if (isTimerRunning) disabledTextStyle.fontFamily else textStyle.fontFamily,
+                fontWeight = if (isTimerRunning) disabledTextStyle.fontWeight else textStyle.fontWeight,
+                fontStyle = if (isTimerRunning) disabledTextStyle.fontStyle else textStyle.fontStyle
             )
         }
     }
 }
 
-class ResendButtonStyle(
+class ResendButtonConfiguration(
     val text: String = DEFAULT_RESEND_BUTTON_TEXT,
-    val textColor: Color = Color.White,
-    val backgroundColor: Color = Color(0xFF6650a4),
     val cornerShape: RoundedCornerShape = RoundedCornerShape(DEFAULT_CORNER_RADIUS.dp),
-    val alignment: ButtonPosition = DefaultResendButtonPosition
+    val alignment: ButtonPosition = ButtonPosition.START,
 ) {
     enum class ButtonPosition { START, END }
 }
-
