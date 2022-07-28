@@ -76,6 +76,6 @@ __`PincodeView` accepts the following optional parameters for in depth customisa
 
 # Change log
 
-Version 1.0.0 *(xx-08-2022)*
+Version 1.0.0 *(28-08-2022)*
 ----------------------------
 * Added PincodeView component
