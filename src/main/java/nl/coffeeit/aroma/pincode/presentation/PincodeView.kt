@@ -155,6 +155,7 @@ fun PincodeView(
     resendButtonConfigurationDisabled: ResendButtonConfiguration = DefaultResendButtonConfigurationDisabled,
     resendCooldownDuration: Int = DEFAULT_RESEND_COOLDOWN_DURATION,
     onResend: () -> Unit = { },
+    triggerResendOnInit: Boolean = true,
     keyEventInErrorState: () -> Unit = { },
 ) {
     val isError: Boolean? by isErrorLiveData.observeAsState()
@@ -422,7 +423,8 @@ fun PincodeView(
                 buttonConfiguration = resendButtonConfiguration,
                 buttonConfigurationDisabled = resendButtonConfigurationDisabled,
                 textStyle = resendButtonTextStyle,
-                disabledTextStyle = resendButtonDisabledTextStyle
+                disabledTextStyle = resendButtonDisabledTextStyle,
+                triggerResendOnInit = triggerResendOnInit
             )
         }
 

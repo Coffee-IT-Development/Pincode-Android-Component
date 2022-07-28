@@ -25,10 +25,19 @@ fun ResendButton(
     buttonConfigurationDisabled: ResendButtonConfiguration = DefaultResendButtonConfigurationDisabled,
     textStyle: TextStyle = DefaultResendButtonTextStyle,
     disabledTextStyle: TextStyle = DefaultResendButtonDisabledTextStyle,
+    triggerResendOnInit: Boolean
 ) {
     var currentTime by remember { mutableStateOf(resendCooldownDuration) }
     var isTimerRunning by remember { mutableStateOf(false) }
     var mutableResendButtonText by remember { mutableStateOf(buttonConfiguration.text) }
+
+    LaunchedEffect(Unit) {
+        if (triggerResendOnInit) {
+            onResend()
+            isTimerRunning = true
+            mutableResendButtonText = buttonConfigurationDisabled.text
+        }
+    }
 
     LaunchedEffect(key1 = currentTime, key2 = isTimerRunning) {
         if (currentTime > 0 && isTimerRunning) {
