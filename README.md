@@ -2,9 +2,9 @@
 
 This document describes how to implement the Pincode component into an app.
 
-Created by [Coffee IT](www.coffeeit.nl)
+Created by [Coffee IT](https://coffeeit.nl/)
 
-# Installation
+# ⚡ Installation
 
 This component requires minimum __SDK 21__.
 
@@ -15,7 +15,7 @@ dependencies {
 }
 ```
 
-# Usage
+# 📖 Usage
 
 To use the component as a Composable, simply add it to your code as is. This example showcases a simple version:
 
@@ -38,7 +38,7 @@ Two parameters are mandatory to make the Composable work:
 
 `isErrorLiveData` represents a `LiveData` object of a `Boolean`. This Boolean determines whether the Pincode view is in an error state or not.
 
-## Customisation
+## ⚙️ Customisation
 __`PincodeView` accepts the following optional parameters for in depth customisation:__
 
 - `lengthOfCode` - An integer that decides the length of the pincode (default 6)
@@ -73,15 +73,15 @@ __`PincodeView` accepts the following optional parameters for in depth customisa
 - `triggerResendOnInit` - `Boolean` that decides whether `onResend` should be ran when initializing the component
 - `keyEventInErrorState` - `Unit` that runs when a key is pressed while the component is in an error state
 
-# License
-The Aroma Pincode component is licensed under the terms of the [MIT Open Source license](https://choosealicense.com/licenses/mit/)
-
-# :email: Contact
-Do you have questions, ideas or need help? Send us a mail at contact@coffeeit.nl
+# 📧 Contact
+Do you have questions, ideas or need help? Send us an email at contact@coffeeit.nl
 
 
-# Change log
+# ✏️ Change log
 
 Version 1.0.0 *(28-08-2022)*
 ----------------------------
 * Added PincodeView component
+
+# ⚠️ License
+The Aroma Pincode component is licensed under the terms of the [MIT Open Source license](https://choosealicense.com/licenses/mit/)
