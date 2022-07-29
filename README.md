@@ -1,6 +1,8 @@
 # Android Aroma Pincode
 
-This document describes how to implement the Pincode component into an app
+This document describes how to implement the Pincode component into an app.
+
+Created by [Coffee IT](www.coffeeit.nl)
 
 # Installation
 
@@ -65,13 +67,17 @@ __`PincodeView` accepts the following optional parameters for in depth customisa
 - `enableResendButton` - Enables the resend button
 - `resendButtonConfiguration` - ResendButtonConfiguration
   - Example: `ResendButtonConfiguration(text = "Send code", cornerShape = RoundedCornerShape(12.Dp), alignment = ButtonPosition.START`
-- `resendButtonConfiguration` - ResendButtonConfiguration when  resend button is disabled
+- `resendButtonConfigurationDisabled` - ResendButtonConfiguration when  resend button is disabled
 - `resendCooldownDuration` - integer in seconds, to determine how long the resend button should be disabled for when clicked
 - `onResend` - `Unit` that runs when the resend button is clicked
-- `triggerResendOnInit` - `Boolean` that decides whether `onResend` should be ran when initiliazing the component
+- `triggerResendOnInit` - `Boolean` that decides whether `onResend` should be ran when initializing the component
 - `keyEventInErrorState` - `Unit` that runs when a key is pressed while the component is in an error state
 
+# License
+The Aroma Pincode component is licensed under the terms of the [MIT Open Source license](https://choosealicense.com/licenses/mit/)
 
+# :email: Contact
+Do you have questions, ideas or need help? Send us a mail at contact@coffeeit.nl
 
 
 # Change log
