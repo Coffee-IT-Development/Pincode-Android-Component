@@ -75,15 +75,16 @@ __`PincodeView` accepts the following optional parameters for in depth customisa
 - `triggerResendOnInit` - `Boolean` that decides whether `onResend` should be ran when initializing the component
 - `keyEventInErrorState` - `Unit` that runs when a key is pressed while the component is in an error state
 
-# 📧 Contact
-Do you have questions, ideas or need help? Send us an email at contact@coffeeit.nl
-
-
 # ✏️ Change log
 
 Version 1.0.0 *(28-08-2022)*
 ----------------------------
 * Added PincodeView component
+
+# 📧 Contact
+Do you have questions, ideas or need help? Send us an email at contact@coffeeit.nl
+
+ <img src="https://coffeeit.nl/wp-content/uploads/2016/09/logo_dark_small_new.png" width="100">
 
 # ⚠️ License
 The Aroma Pincode component is licensed under the terms of the [MIT Open Source license](https://choosealicense.com/licenses/mit/)
