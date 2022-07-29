@@ -1,4 +1,6 @@
-# Android Aroma Pincode
+![header image](https://coffeeit.nl/wp-content/uploads/2022/07/Aroma_Pincode_Android.png)
+
+# ☕️ Android Aroma Pincode
 
 This document describes how to implement the Pincode component into an app.
 
