@@ -23,19 +23,12 @@
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   ~ SOFTWARE.
   -->
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:orientation="vertical"
-        android:layout_height="match_parent">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="28dp"
-            android:text="Pincode Component"/>
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
         <androidx.compose.ui.platform.ComposeView
             android:id="@+id/cv_pincode"
@@ -43,6 +36,6 @@
             android:layout_marginTop="28dp"
             android:layout_height="wrap_content" />
 
-    </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
 </layout>
