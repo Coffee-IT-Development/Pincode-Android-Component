@@ -2,9 +2,13 @@
 
 # ☕️ Android Aroma Pincode
 
-This document describes how to implement the Pincode component into an app.
+The Android Aroma Pincode package provides a highly customisable pincode view. This README describes 
+how to implement the Pincode component into an app.
 
-Created by [Coffee IT](https://coffeeit.nl/)
+This GitHub repository is a mirror, the official repository is hosted privately by Coffee IT.
+
+Created by [Coffee IT](https://coffeeit.nl/). Look at our other repositories on our 
+[GitHub account](https://github.com/orgs/Coffee-IT-Development/repositories).
 
 # ⚡ Installation
 
