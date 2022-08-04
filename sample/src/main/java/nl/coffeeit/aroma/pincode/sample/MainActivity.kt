@@ -30,10 +30,9 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.*
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -51,6 +50,10 @@ import androidx.lifecycle.MutableLiveData
 import nl.coffeeit.aroma.pincode.presentation.PincodeView
 import nl.coffeeit.aroma.pincode.presentation.ResendButtonConfiguration
 import nl.coffeeit.aroma.pincode.sample.databinding.ActivityMainBinding
+
+private const val FULL_ALPHA = 1
+private const val MILLISECOND = 1L
+private const val PROGRESS_PER_MILLISECOND = 0.01f
 
 class MainActivity : AppCompatActivity() {
 
@@ -156,8 +159,8 @@ class MainActivity : AppCompatActivity() {
                         val handler = Handler(Looper.getMainLooper())
                         handler.postDelayed(object : Runnable {
                             override fun run() {
-                                val newProgress = (progress.value ?: 0f) + 0.007f
-                                if (newProgress > 1f) {
+                                val newProgress = (progress.value ?: 0f) + PROGRESS_PER_MILLISECOND
+                                if (newProgress > FULL_ALPHA) {
                                     handler.removeCallbacksAndMessages(null)
                                     isError.postValue(true)
                                     progress.postValue(0f)
@@ -165,16 +168,17 @@ class MainActivity : AppCompatActivity() {
                                 } else {
                                     progress.postValue(newProgress)
                                 }
-                                handler.postDelayed(this, 1)
+                                handler.postDelayed(this, MILLISECOND)
                             }
-                        }, 1)
+                        }, MILLISECOND)
                     },
                     keyEventInErrorState = {
                         isError.postValue(false)
                     },
                     autoFocusFirstInput = true,
                     errorText = "Wrong code entered",
-                    resendButtonConfigurationDisabled = ResendButtonConfiguration(alignment = ResendButtonConfiguration.ButtonPosition.END)
+                    resendButtonConfigurationDisabled = ResendButtonConfiguration(alignment = ResendButtonConfiguration.ButtonPosition.END),
+                    onBack = { finish() }
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -185,6 +189,8 @@ class MainActivity : AppCompatActivity() {
                     color = Color(0xFF4D6CDB),
                     backgroundColor = Color(0xFFE1E2E2),
                 )
+
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }
