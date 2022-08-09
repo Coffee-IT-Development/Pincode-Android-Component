@@ -2,8 +2,6 @@
 
 # ☕️ Android Aroma Pincode
 
-![Gif of the pincode component being used](https://i.imgur.com/PZkGq79.gif)
-
 The Android Aroma Pincode package provides a highly customisable pincode view. This README describes 
 how to implement the Pincode component into an app.
 
@@ -11,6 +9,8 @@ This GitHub repository is a mirror, the official repository is hosted privately 
 
 Created by [Coffee IT](https://coffeeit.nl/). Look at our other repositories on our 
 [GitHub account](https://github.com/orgs/Coffee-IT-Development/repositories).
+
+<img src="https://i.imgur.com/PZkGq79.gif" width="300">
 
 # ⚡ Installation
 
