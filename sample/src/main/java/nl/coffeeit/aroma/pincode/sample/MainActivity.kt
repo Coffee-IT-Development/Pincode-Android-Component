@@ -88,10 +88,10 @@ class MainActivity : AppCompatActivity() {
             ) {
                 Image(
                     modifier = Modifier
-                        .width(275.dp)
+                        .width(231.dp)
                         .align(Alignment.CenterHorizontally),
-                    painter = painterResource(R.drawable.ill_welcome_cats),
-                    contentDescription = "Cats welcoming you",
+                    painter = painterResource(R.drawable.ill_aroma_logo),
+                    contentDescription = "Coffee IT's Aroma logo",
                     contentScale = ContentScale.FillWidth
                 )
 
@@ -177,7 +177,6 @@ class MainActivity : AppCompatActivity() {
                     },
                     autoFocusFirstInput = true,
                     errorText = "Wrong code entered",
-                    resendButtonConfigurationDisabled = ResendButtonConfiguration(alignment = ResendButtonConfiguration.ButtonPosition.END),
                     onBack = { finish() }
                 )
 
