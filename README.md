@@ -1,5 +1,8 @@
 ![header image](https://coffeeit.nl/wp-content/uploads/2022/07/Aroma_Pincode_Android.png)
 
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/nl.coffeeit.aroma/pincode/badge.svg)](https://maven-badges.herokuapp.com/Maven-Central/nl.coffeeit.aroma/pincode) [![API](https://img.shields.io/badge/API-14%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=21) [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://github.com/Coffee-IT-Development/Pincode-Android-Component/blob/main/LICENSE) [![Mirror Repository](https://img.shields.io/badge/Mirror-Repository-9b34eb?style=flat-square)]()
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-@CoffeeIT-blue.svg?style=flat-square)](https://linkedin.com/company/coffee-it) [![Facebook](https://img.shields.io/badge/Facebook-CoffeeITNL-blue.svg?style=flat-square)](https://www.facebook.com/CoffeeITNL/) [![Instagram](https://img.shields.io/badge/Instagram-CoffeeITNL-blue.svg?style=flat-square)](https://www.instagram.com/coffeeitnl/) [![Follow coffeeitnl on Twitter](https://img.shields.io/twitter/follow/coffeeitnl.svg?style=flat-square&logo=twitter)](https://twitter.com/coffeeitnl)
+
 # ☕️ Android Aroma Pincode
 
 The Android Aroma Pincode package provides a highly customisable pincode view. This README describes 
@@ -13,7 +16,6 @@ Created by [Coffee IT](https://coffeeit.nl/). Look at our other repositories on 
 <img src="https://i.imgur.com/PZkGq79.gif" width="300">
 
 # ⚡ Installation
-
 This component requires minimum __SDK 21__.
 
 Add the following to `build.gradle`:
@@ -110,4 +112,4 @@ Do you have questions, ideas or need help? Send us an email at contact@coffeeit.
  <img src="https://coffeeit.nl/wp-content/uploads/2016/09/logo_dark_small_new.png" width="100">
 
 # ⚠️ License
-The Aroma Pincode component is licensed under the terms of the [MIT Open Source license](https://choosealicense.com/licenses/mit/).
+The Aroma Pincode component is licensed under the terms of the [MIT Open Source license](https://github.com/Coffee-IT-Development/Pincode-Android-Component/blob/main/LICENSE).
