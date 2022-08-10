@@ -24,9 +24,20 @@
  * SOFTWARE.
  */
 
-package nl.coffeeit.aroma.pincode.domain.model
+package nl.coffeeit.aroma.pincode.sample
 
-data class PincodeItem(
-    val index: Int,
-    var text: String
-)
+import org.junit.Test
+
+import org.junit.Assert.*
+
+/**
+ * Example local unit test, which will execute on the development machine (host).
+ *
+ * See [testing documentation](http://d.android.com/tools/testing).
+ */
+class ExampleUnitTest {
+    @Test
+    fun addition_isCorrect() {
+        assertEquals(4, 2 + 2)
+    }
+}
