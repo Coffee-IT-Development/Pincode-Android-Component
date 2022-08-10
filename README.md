@@ -25,7 +25,7 @@ dependencies {
 
 # 📖 Usage
 
-To use the component as a Composable, simply add it to your code as is. This example showcases a simple version:
+To use the component as in a Compose project, simply add it to your code as is. This example showcases a simple version:
 
 ```
 PincodeView(
@@ -39,6 +39,23 @@ PincodeView(
                 // Resend button clicked
             }
         )
+```
+
+To use the component as part of a XML-based project, add a `ComposeView` element to your layout file and call the `setContent` method in your activity/fragment:
+
+```
+lateinit var binding: ActivityMainBinding
+    private val isError = MutableLiveData(false)
+    private val pincode = MutableLiveData("")
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+
+        binding.cvPincode.setContent {
+            PincodeView(pincodeLiveData = pincode, isErrorLiveData = isError)
+        }
+    }
 ```
 Two parameters are mandatory to make the Composable work:
 
