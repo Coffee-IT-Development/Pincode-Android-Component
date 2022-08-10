@@ -26,7 +26,7 @@
   -->
 
 <resources>
-    <style name="Theme.AromaAndroidSample" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.AromaAndroidSample" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimary">@color/purple_500</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>
         <item name="colorOnPrimary">@color/white</item>
