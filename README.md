@@ -1,4 +1,4 @@
-![header image](https://coffeeit.nl/wp-content/uploads/2022/07/Aroma_Pincode_Android.png)
+[![Coffee IT - Android Aroma Pincode Component](https://coffeeit.nl/wp-content/uploads/2022/07/Aroma_Pincode_Android.png)](https://coffeeit.nl/)
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/nl.coffeeit.aroma/pincode/badge.svg)](https://maven-badges.herokuapp.com/Maven-Central/nl.coffeeit.aroma/pincode) 
 [![API](https://img.shields.io/badge/API-21%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=21)
@@ -106,7 +106,7 @@ __`PincodeView` accepts the following optional parameters for in depth customisa
 - `triggerResendOnInit` - `Boolean` that decides whether `onResend` should be ran when initializing the component
 - `keyEventInErrorState` - `Unit` that runs when a key is pressed while the component is in an error state
 
-# ✏️ Change log
+# ✏️ Changelog
 
 Version 1.0.0 *(28-07-2022)*
 ----------------------------
