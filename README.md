@@ -1,6 +1,8 @@
 ![header image](https://coffeeit.nl/wp-content/uploads/2022/07/Aroma_Pincode_Android.png)
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/nl.coffeeit.aroma/pincode/badge.svg)](https://maven-badges.herokuapp.com/Maven-Central/nl.coffeeit.aroma/pincode) [![API](https://img.shields.io/badge/API-14%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=21) [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://github.com/Coffee-IT-Development/Pincode-Android-Component/blob/main/LICENSE) [![Mirror Repository](https://img.shields.io/badge/Mirror-Repository-9b34eb?style=flat-square)]()
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/nl.coffeeit.aroma/pincode/badge.svg)](https://maven-badges.herokuapp.com/Maven-Central/nl.coffeeit.aroma/pincode) 
+[![API](https://img.shields.io/badge/API-14%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=21) 
+[![License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://github.com/Coffee-IT-Development/Pincode-Android-Component/blob/main/LICENSE) [![Mirror Repository](https://img.shields.io/badge/Mirror-Repository-9b34eb?style=flat-square)]()
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-@CoffeeIT-blue.svg?style=flat-square)](https://linkedin.com/company/coffee-it) [![Facebook](https://img.shields.io/badge/Facebook-CoffeeITNL-blue.svg?style=flat-square)](https://www.facebook.com/CoffeeITNL/) [![Instagram](https://img.shields.io/badge/Instagram-CoffeeITNL-blue.svg?style=flat-square)](https://www.instagram.com/coffeeitnl/) [![Follow coffeeitnl on Twitter](https://img.shields.io/twitter/follow/coffeeitnl.svg?style=flat-square&logo=twitter)](https://twitter.com/coffeeitnl)
 
 # ☕️ Android Aroma Pincode
