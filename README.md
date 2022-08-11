@@ -37,16 +37,16 @@ To use the component as in a Compose project, simply add it to your code as is. 
 
 ```
 PincodeView(
-            pincodeLiveData = pincode,
-            isErrorLiveData = isError,
-            enableResendButton = true,
-            onPincodeCompleted = {
-                // Pin code filled in
-            },
-            onResend = {
-                // Resend button clicked
-            }
-        )
+    pincodeLiveData = pincode,
+    isErrorLiveData = isError,
+    enableResendButton = true,
+    onPincodeCompleted = {
+        // Pin code filled in
+    },
+    onResend = {
+        // Resend button clicked
+    }
+)
 ```
 
 To use the component as part of a XML-based project, add a `ComposeView` element to your layout file and call the `setContent` method in your activity/fragment:
