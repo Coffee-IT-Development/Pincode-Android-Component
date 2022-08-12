@@ -115,7 +115,11 @@ Version 1.0.0 *(28-07-2022)*
 # 📧 Contact
 Do you have questions, ideas or need help? Send us an email at contact@coffeeit.nl.
 
- <img src="https://coffeeit.nl/wp-content/uploads/2016/09/logo_dark_small_new.png" width="100">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://global-uploads.webflow.com/605a171ee93af49275331843/623b23cdea80a92703e61b42_Logo_black_1.svg" width="100">
+  <source media="(prefers-color-scheme: light)" srcset="https://coffeeit.nl/wp-content/uploads/2016/09/logo_dark_small_new.png" width="100">
+  <img alt="The Coffee IT logo" src="https://coffeeit.nl/wp-content/uploads/2016/09/logo_dark_small_new.png">
+</picture>
 
 # ⚠️ License
 The Aroma Pincode component is licensed under the terms of the [MIT Open Source license](https://github.com/Coffee-IT-Development/Pincode-Android-Component/blob/main/LICENSE).
