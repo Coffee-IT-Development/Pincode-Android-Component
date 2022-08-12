@@ -119,5 +119,3 @@ Do you have questions, ideas or need help? Send us an email at contact@coffeeit.
 
 # ⚠️ License
 The Aroma Pincode component is licensed under the terms of the [MIT Open Source license](https://github.com/Coffee-IT-Development/Pincode-Android-Component/blob/main/LICENSE).
-
-// Trigger mirror
