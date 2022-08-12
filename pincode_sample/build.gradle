@@ -74,7 +74,7 @@ android {
 }
 
 dependencies {
-    implementation project(path: ':pincode:pincode')
+    implementation project(path: ':pincode')
 
     // Integration with activities
     implementation "androidx.activity:activity-compose:1.5.1"

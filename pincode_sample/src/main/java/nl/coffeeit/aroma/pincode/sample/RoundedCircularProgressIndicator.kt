@@ -34,7 +34,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProgressIndicatorDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
+//import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -60,7 +60,7 @@ internal fun RoundedCircularProgressIndicator(
         Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Round)
     }
 
-    val progress: Float? by progressLiveData.observeAsState()
+    val progress: Float? = 0f//by progressLiveData.observeAsState()
 
     Canvas(
         modifier
