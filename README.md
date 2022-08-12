@@ -115,12 +115,10 @@ Version 1.0.0 *(28-07-2022)*
 # 📧 Contact
 Do you have questions, ideas or need help? Send us an email at contact@coffeeit.nl.
 
-<img src="https://coffeeit.nl/wp-content/uploads/2016/09/logo_dark_small_new.png" width="100">
-
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/25423296/163456776-7f95b81a-f1ed-45f7-b7ab-8fa810d529fa.png">
+  <source media="(prefers-color-scheme: dark)" srcset="https://global-uploads.webflow.com/605a171ee93af49275331843/623b23cdea80a92703e61b42_Logo_black_1.svg" width="100">
   <source media="(prefers-color-scheme: light)" srcset="https://coffeeit.nl/wp-content/uploads/2016/09/logo_dark_small_new.png" width="100">
-  <img alt="Shows an illustrated sun in light color mode and a moon with stars in dark color mode." src="https://coffeeit.nl/wp-content/uploads/2016/09/logo_dark_small_new.png">
+  <img alt="The Coffee IT logo" src="https://coffeeit.nl/wp-content/uploads/2016/09/logo_dark_small_new.png">
 </picture>
 
 # ⚠️ License
