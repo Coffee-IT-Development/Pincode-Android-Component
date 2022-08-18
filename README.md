@@ -22,12 +22,13 @@ Created by [Coffee IT](https://coffeeit.nl/). Look at our other repositories on 
 <img src="https://i.imgur.com/PZkGq79.gif" width="300">
 
 # ⚡ Installation
+
 This component requires minimum __SDK 21__.
 
 Add the following to `build.gradle`:
 ```
 dependencies {
-    implementation "nl.coffeeit.aroma:pincode:1.0.0"
+    implementation "nl.coffeeit.aroma:pincode:1.0.1"
 }
 ```
 
@@ -126,4 +127,4 @@ Do you have questions, ideas or need help? Send us an email at contact@coffeeit.
 </picture>
 
 # ⚠️ License
-The Aroma Pincode component is licensed under the terms of the [MIT Open Source license](https://github.com/Coffee-IT-Development/Pincode-Android-Component/blob/main/LICENSE).
+Android Aroma Pincode is licensed under the terms of the [MIT Open Source license](https://github.com/Coffee-IT-Development/Pincode-Android-Component/blob/main/LICENSE).
