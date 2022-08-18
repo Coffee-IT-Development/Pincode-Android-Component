@@ -39,12 +39,12 @@ To use the component as in a Compose project, simply add it to your code as is. 
 PincodeView(
     pincodeLiveData = pincode,
     isErrorLiveData = isError,
-    enableResendButton = true,
+    enableSendButton = true,
     onPincodeCompleted = {
         // Pin code filled in
     },
-    onResend = {
-        // Resend button clicked
+    onSend = {
+        // Send button clicked
     }
 )
 ```
@@ -65,11 +65,6 @@ lateinit var binding: ActivityMainBinding
         }
     }
 ```
-Two parameters are mandatory to make the Composable work:
-
-`pincodeLiveData` expects a `LiveData` object of a `String`. This object will be updated to reflect the Pincode characters in the UI.
-
-`isErrorLiveData` represents a `LiveData` object of a `Boolean`. This Boolean determines whether the Pincode view is in an error state or not.
 
 ## ⚙️ Customisation
 __`PincodeView` accepts the following optional parameters for in depth customisation:__
@@ -90,27 +85,36 @@ __`PincodeView` accepts the following optional parameters for in depth customisa
 - `inputTextStyle` - `TextStyle` object to determine the text style of inputs
 - `inputErrorTextStyle` - `TextStyle` object to determine the text style of inputs when in error state
 - `errorLabelTextStyle` - `TextStyle` object to determine the text style of the error label
-- `resendButtonTextStyle` - `TextStyle` object to determine the text style of the resend button
-- `resendButtonDisabledTextStyle` - `TextStyle` object to determine the text style of the error label when disabled
+- `sendButtonTextStyle` - `TextStyle` object to determine the text style of the send button
+- `sendButtonDisabledTextStyle` - `TextStyle` object to determine the text style of the error label when disabled
 - `onlyDigits` - `Boolean` to make the component accept only digits
 - `autoFocusFirstInput` - `Boolean` to make the component focus the first input automatically
 - `resetPincodeLiveData` - `Unit` that runs when the Pincode `LiveData` gets reset
 - `onBack` - `Unit` that runs when the back button is pressed
 - `onPincodeCompleted` - `Unit` that runs when all cells are filled in
-- `enableResendButton` - Enables the resend button
-- `resendButtonConfiguration` - ResendButtonConfiguration
-  - Example: `ResendButtonConfiguration(text = "Send code", cornerShape = RoundedCornerShape(12.Dp), alignment = ButtonPosition.START`
-- `resendButtonConfigurationDisabled` - ResendButtonConfiguration when  resend button is disabled
-- `resendCooldownDuration` - integer in seconds, to determine how long the resend button should be disabled for when clicked
-- `onResend` - `Unit` that runs when the resend button is clicked
-- `triggerResendOnInit` - `Boolean` that decides whether `onResend` should be ran when initializing the component
+- `enableSendButton` - Enables the send button
+- `sendButtonConfiguration` - SendButtonConfiguration
+  - Example: `SendButtonConfiguration(text = "Send code", cornerShape = RoundedCornerShape(12.Dp), alignment = ButtonPosition.START`
+- `sendButtonConfigurationDisabled` - SendButtonConfiguration when  send button is disabled
+- `sendCooldownDuration` - integer in seconds, to determine how long the send button should be disabled for when clicked
+- `onSend` - `Unit` that runs when the send button is clicked
+- `pincodeLiveData` - `LiveData` object of a `String`. This `Object` will be updated to reflect the Pincode characters in the UI.
+- `isErrorLiveData` `LiveData` object of a `Boolean`. This `Boolean` determines whether the Pincode view is in an error state or not.
+- `sendCodeLiveData` - `LiveData` object of a `Boolean`. When this `Boolean` is set to `true` `onSend` is triggered, 
+the timer starts counting down and the send button gets disabled. Should be set to `false` to be able to use it again.
 - `keyEventInErrorState` - `Unit` that runs when a key is pressed while the component is in an error state
 
 # ✏️ Changelog
 
+Version 1.0.1 *(18-08-2022)*
+----------------------------
+* Renamed `resend` methods, variables and constants to `send`.
+* Removed `triggerResendOnInit`, a `Boolean` formerly used to decide whether `onSend` should be ran when initializing the component.
+* Added `sendCodeLiveData`, a `Boolean` which triggers `onSend`.
+
 Version 1.0.0 *(28-07-2022)*
 ----------------------------
-* Added PincodeView component
+* Added PincodeView component.
 
 # 📧 Contact
 Do you have questions, ideas or need help? Send us an email at contact@coffeeit.nl.

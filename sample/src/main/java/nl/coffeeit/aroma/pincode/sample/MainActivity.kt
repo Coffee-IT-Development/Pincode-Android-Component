@@ -48,7 +48,7 @@ import androidx.compose.ui.unit.sp
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.MutableLiveData
 import nl.coffeeit.aroma.pincode.presentation.PincodeView
-import nl.coffeeit.aroma.pincode.presentation.ResendButtonConfiguration
+import nl.coffeeit.aroma.pincode.presentation.SendButtonConfiguration
 import nl.coffeeit.aroma.pincode.sample.databinding.ActivityMainBinding
 
 private const val FULL_ALPHA = 1
@@ -61,6 +61,7 @@ class MainActivity : AppCompatActivity() {
     private val isError = MutableLiveData(false)
     private val handler = Handler(Looper.getMainLooper())
     private val pincode = MutableLiveData("")
+    private val sendCode = MutableLiveData<Boolean>()
 
     private val fontFamily = FontFamily(
         Font(R.font.inter_thin, FontWeight.Thin),
@@ -101,9 +102,8 @@ class MainActivity : AppCompatActivity() {
                     pincodeLiveData = pincode,
                     isErrorLiveData = isError,
                     showDividerAfterInput = 3,
-                    enableResendButton = true,
-                    resendButtonConfiguration = ResendButtonConfiguration(),
-                    triggerResendOnInit = false,
+                    enableSendButton = true,
+                    sendButtonConfiguration = SendButtonConfiguration(),
                     focusedBorderThickness = 2.dp,
                     unfocusedBorderThickness = 2.dp,
                     inputSpacing = 8.dp,
@@ -133,7 +133,7 @@ class MainActivity : AppCompatActivity() {
                         color = Color(0xFFFF7A7A),
                         fontSize = 26.sp
                     ),
-                    resendButtonTextStyle = TextStyle(
+                    sendButtonTextStyle = TextStyle(
                         textAlign = TextAlign.Center,
                         fontFamily = fontFamily,
                         fontWeight = FontWeight.Medium,
@@ -141,7 +141,7 @@ class MainActivity : AppCompatActivity() {
                         fontSize = 15.sp,
                         background = Color(0xFFDDDFE4)
                     ),
-                    resendButtonDisabledTextStyle = TextStyle(
+                    sendButtonDisabledTextStyle = TextStyle(
                         textAlign = TextAlign.Center,
                         fontFamily = fontFamily,
                         fontWeight = FontWeight.Medium,
@@ -177,7 +177,8 @@ class MainActivity : AppCompatActivity() {
                     },
                     autoFocusFirstInput = true,
                     errorText = "Wrong code entered",
-                    onBack = { finish() }
+                    onBack = { finish() },
+                    sendCodeLiveData = sendCode
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -192,6 +193,7 @@ class MainActivity : AppCompatActivity() {
                 Spacer(modifier = Modifier.height(16.dp))
             }
         }
+        sendCode.postValue(true)
     }
 
     override fun onDestroy() {

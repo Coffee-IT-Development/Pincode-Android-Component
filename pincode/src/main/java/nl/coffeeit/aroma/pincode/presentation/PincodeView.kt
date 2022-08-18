@@ -70,14 +70,14 @@ import nl.coffeeit.aroma.pincode.domain.model.PincodeItem
 import nl.coffeeit.aroma.pincode.extension.digits
 import nl.coffeeit.aroma.pincode.extension.digitsAndLetters
 
-internal const val DEFAULT_RESEND_COOLDOWN_DURATION = 60
+internal const val DEFAULT_SEND_COOLDOWN_DURATION = 60
 private const val DEFAULT_CORNER_RADIUS = 8
 private const val DEFAULT_LENGTH_OF_CODE = 6
 private const val KEYBOARD_OPEN_DELAY_IN_MILLIS = 100L
 private const val MAXIMUM_AMOUNT_OF_CHARACTERS_PER_INPUT = 1
 
-internal val DefaultResendButtonConfiguration = ResendButtonConfiguration()
-internal val DefaultResendButtonConfigurationDisabled = ResendButtonConfiguration()
+internal val DefaultSendButtonConfiguration = SendButtonConfiguration()
+internal val DefaultSendButtonConfigurationDisabled = SendButtonConfiguration()
 private val DefaultBackgroundColor = Color(0xFFF6F6F6)
 private val DefaultDividerColor = Color(0xFF625b71)
 private val DefaultErrorColor = Color(0xFFF7694A)
@@ -98,11 +98,11 @@ private val DefaultFontFamily = FontFamily(
     Font(R.font.roboto_black_italic, FontWeight.Black, FontStyle.Italic)
 )
 private val DefaultFontStyleInput = FontStyle.Normal
-private val DefaultFontStyleResendButton = FontStyle.Normal
-private val DefaultFontWeightResendButton = FontWeight.Normal
+private val DefaultFontStyleSendButton = FontStyle.Normal
+private val DefaultFontWeightSendButton = FontWeight.Normal
 private val DefaultFontWeightInput = FontWeight.Normal
-private val DefaultResendButtonBackgroundColor = Color(0xFF6650a4)
-private val DefaultResendButtonBackgroundDisabledColor = Color(0x806650A4)
+private val DefaultSendButtonBackgroundColor = Color(0xFF6650a4)
+private val DefaultSendButtonBackgroundDisabledColor = Color(0x806650A4)
 
 private val DefaultInputTextStyle: TextStyle = TextStyle(
     textAlign = TextAlign.Center,
@@ -124,19 +124,19 @@ private val DefaultErrorLabelTextStyle: TextStyle = TextStyle(
     fontWeight = DefaultFontWeightInput,
     fontStyle = DefaultFontStyleInput
 )
-internal val DefaultResendButtonTextStyle: TextStyle = TextStyle(
+internal val DefaultSendButtonTextStyle: TextStyle = TextStyle(
     color = Color.White,
-    background = DefaultResendButtonBackgroundColor,
+    background = DefaultSendButtonBackgroundColor,
     fontFamily = DefaultFontFamily,
-    fontWeight = DefaultFontWeightResendButton,
-    fontStyle = DefaultFontStyleResendButton
+    fontWeight = DefaultFontWeightSendButton,
+    fontStyle = DefaultFontStyleSendButton
 )
-internal val DefaultResendButtonDisabledTextStyle: TextStyle = TextStyle(
+internal val DefaultSendButtonDisabledTextStyle: TextStyle = TextStyle(
     color = Color.White,
-    background = DefaultResendButtonBackgroundDisabledColor,
+    background = DefaultSendButtonBackgroundDisabledColor,
     fontFamily = DefaultFontFamily,
-    fontWeight = DefaultFontWeightResendButton,
-    fontStyle = DefaultFontStyleResendButton
+    fontWeight = DefaultFontWeightSendButton,
+    fontStyle = DefaultFontStyleSendButton
 )
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
@@ -167,21 +167,21 @@ fun PincodeView(
     inputTextStyle: TextStyle = DefaultInputTextStyle,
     inputErrorTextStyle: TextStyle = DefaultInputErrorTextStyle,
     errorLabelTextStyle: TextStyle = DefaultErrorLabelTextStyle,
-    resendButtonTextStyle: TextStyle = DefaultResendButtonTextStyle,
-    resendButtonDisabledTextStyle: TextStyle = DefaultResendButtonDisabledTextStyle,
+    sendButtonTextStyle: TextStyle = DefaultSendButtonTextStyle,
+    sendButtonDisabledTextStyle: TextStyle = DefaultSendButtonDisabledTextStyle,
     onlyDigits: Boolean = true,
     autoFocusFirstInput: Boolean = false,
-    pincodeLiveData: LiveData<String>,
-    isErrorLiveData: LiveData<Boolean>,
+    pincodeLiveData: LiveData<String> = MutableLiveData(""),
+    isErrorLiveData: LiveData<Boolean> = MutableLiveData(false),
     resetPincodeLiveData: () -> Unit = { },
     onBack: () -> Unit = { },
     onPincodeCompleted: (String?) -> Unit = { },
-    enableResendButton: Boolean = false,
-    resendButtonConfiguration: ResendButtonConfiguration = DefaultResendButtonConfiguration,
-    resendButtonConfigurationDisabled: ResendButtonConfiguration = DefaultResendButtonConfigurationDisabled,
-    resendCooldownDuration: Int = DEFAULT_RESEND_COOLDOWN_DURATION,
-    onResend: () -> Unit = { },
-    triggerResendOnInit: Boolean = true,
+    enableSendButton: Boolean = false,
+    sendButtonConfiguration: SendButtonConfiguration = DefaultSendButtonConfiguration,
+    sendButtonConfigurationDisabled: SendButtonConfiguration = DefaultSendButtonConfigurationDisabled,
+    sendCooldownDuration: Int = DEFAULT_SEND_COOLDOWN_DURATION,
+    sendCodeLiveData: LiveData<Boolean> = MutableLiveData(false),
+    onSend: () -> Unit = { },
     keyEventInErrorState: () -> Unit = { },
 ) {
     val isError: Boolean? by isErrorLiveData.observeAsState()
@@ -440,17 +440,17 @@ fun PincodeView(
             }
         }
 
-        if (enableResendButton) {
+        if (enableSendButton) {
             Spacer(modifier = Modifier.height(16.dp))
 
-            ResendButton(
-                resendCooldownDuration = resendCooldownDuration,
-                onResend = onResend,
-                buttonConfiguration = resendButtonConfiguration,
-                buttonConfigurationDisabled = resendButtonConfigurationDisabled,
-                textStyle = resendButtonTextStyle,
-                disabledTextStyle = resendButtonDisabledTextStyle,
-                triggerResendOnInit = triggerResendOnInit
+            SendButton(
+                sendCooldownDuration = sendCooldownDuration,
+                onSend = onSend,
+                buttonConfiguration = sendButtonConfiguration,
+                buttonConfigurationDisabled = sendButtonConfigurationDisabled,
+                textStyle = sendButtonTextStyle,
+                disabledTextStyle = sendButtonDisabledTextStyle,
+                sendCodeLiveData = sendCodeLiveData
             )
         }
 
@@ -503,11 +503,5 @@ private fun DividerWithSpacerEnd(
 @Composable
 @Preview(showBackground = true)
 fun ModalPincodeViewPreview() {
-    val isError = MutableLiveData<Boolean>()
-    val pincode = MutableLiveData<String>()
-
-    PincodeView(
-        pincodeLiveData = pincode,
-        isErrorLiveData = isError
-    )
+    PincodeView()
 }
