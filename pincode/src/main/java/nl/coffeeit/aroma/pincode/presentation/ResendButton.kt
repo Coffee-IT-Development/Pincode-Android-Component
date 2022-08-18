@@ -34,36 +34,33 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.delay
 import java.util.concurrent.TimeUnit
 
-private const val DEFAULT_RESEND_BUTTON_TEXT = "Send code again"
+private const val DEFAULT_SEND_BUTTON_TEXT = "Send code again"
 private const val DEFAULT_CORNER_RADIUS = 16
 
 @Composable
-fun ResendButton(
-    resendCooldownDuration: Int = DEFAULT_RESEND_COOLDOWN_DURATION,
-    onResend: () -> Unit,
-    buttonConfiguration: ResendButtonConfiguration = DefaultResendButtonConfiguration,
-    buttonConfigurationDisabled: ResendButtonConfiguration = DefaultResendButtonConfigurationDisabled,
-    textStyle: TextStyle = DefaultResendButtonTextStyle,
-    disabledTextStyle: TextStyle = DefaultResendButtonDisabledTextStyle,
-    triggerResendOnInit: Boolean
+fun SendButton(
+    sendCooldownDuration: Int = DEFAULT_SEND_COOLDOWN_DURATION,
+    onSend: () -> Unit,
+    buttonConfiguration: SendButtonConfiguration = DefaultSendButtonConfiguration,
+    buttonConfigurationDisabled: SendButtonConfiguration = DefaultSendButtonConfigurationDisabled,
+    textStyle: TextStyle = DefaultSendButtonTextStyle,
+    disabledTextStyle: TextStyle = DefaultSendButtonDisabledTextStyle,
+    sendCodeLiveData: LiveData<Boolean> = MutableLiveData(false)
 ) {
-    var currentTime by remember { mutableStateOf(resendCooldownDuration) }
+    var currentTime by remember { mutableStateOf(sendCooldownDuration) }
     var isTimerRunning by remember { mutableStateOf(false) }
-    var mutableResendButtonText by remember { mutableStateOf(buttonConfiguration.text) }
+    var mutableSendButtonText by remember { mutableStateOf(buttonConfiguration.text) }
+    val sendCode: Boolean? by sendCodeLiveData.observeAsState()
 
-    LaunchedEffect(Unit) {
-        if (triggerResendOnInit) {
-            onResend()
-            isTimerRunning = true
-            mutableResendButtonText = buttonConfigurationDisabled.text
-        }
-    }
 
     LaunchedEffect(key1 = currentTime, key2 = isTimerRunning) {
         if (currentTime > 0 && isTimerRunning) {
@@ -71,26 +68,34 @@ fun ResendButton(
             currentTime -= 1
         } else {
             isTimerRunning = false
-            currentTime = resendCooldownDuration
+            currentTime = sendCooldownDuration
+        }
+    }
+
+    LaunchedEffect(key1 = sendCode) {
+        if (sendCode == true) {
+            onSend()
+            isTimerRunning = true
+            mutableSendButtonText = buttonConfigurationDisabled.text
         }
     }
 
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = when (if (isTimerRunning) buttonConfigurationDisabled.alignment else buttonConfiguration.alignment) {
-            ResendButtonConfiguration.ButtonPosition.START -> {
+            SendButtonConfiguration.ButtonPosition.START -> {
                 Arrangement.Start
             }
-            ResendButtonConfiguration.ButtonPosition.END -> {
+            SendButtonConfiguration.ButtonPosition.END -> {
                 Arrangement.End
             }
         }
     ) {
         Button(
             onClick = {
-                onResend()
+                onSend()
                 isTimerRunning = true
-                mutableResendButtonText = buttonConfigurationDisabled.text
+                mutableSendButtonText = buttonConfigurationDisabled.text
             },
             shape = if (isTimerRunning) buttonConfigurationDisabled.cornerShape else buttonConfiguration.cornerShape,
             enabled = !isTimerRunning,
@@ -103,10 +108,10 @@ fun ResendButton(
         ) {
             Text(
                 text = if (isTimerRunning) {
-                    "$mutableResendButtonText ($currentTime)"
+                    "$mutableSendButtonText ($currentTime)"
                 } else {
-                    mutableResendButtonText = buttonConfiguration.text
-                    mutableResendButtonText
+                    mutableSendButtonText = buttonConfiguration.text
+                    mutableSendButtonText
                 },
                 fontFamily = if (isTimerRunning) disabledTextStyle.fontFamily else textStyle.fontFamily,
                 fontWeight = if (isTimerRunning) disabledTextStyle.fontWeight else textStyle.fontWeight,
@@ -116,8 +121,8 @@ fun ResendButton(
     }
 }
 
-class ResendButtonConfiguration(
-    val text: String = DEFAULT_RESEND_BUTTON_TEXT,
+class SendButtonConfiguration(
+    val text: String = DEFAULT_SEND_BUTTON_TEXT,
     val cornerShape: RoundedCornerShape = RoundedCornerShape(DEFAULT_CORNER_RADIUS.dp),
     val alignment: ButtonPosition = ButtonPosition.START,
 ) {
