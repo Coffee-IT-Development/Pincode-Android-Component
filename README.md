@@ -110,6 +110,10 @@ the timer starts counting down and the send button gets disabled. Should be set 
 
 The changelog can be found [here](https://github.com/Coffee-IT-Development/Pincode-Android-Component/blob/main/CHANGELOG.md).
 
+# 🔗 Related publications
+
+- [Aroma Pincode Component for iOS](https://github.com/Coffee-IT-Development/Pincode-iOS-Component)
+
 # 📧 Contact
 
 Do you have questions, ideas or need help? Send us an email at contact@coffeeit.nl.
