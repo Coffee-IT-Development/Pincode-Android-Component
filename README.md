@@ -16,8 +16,7 @@ how to implement the Pincode component into an app.
 
 This GitHub repository is a mirror, the official repository is hosted privately by Coffee IT.
 
-Created by [Coffee IT](https://coffeeit.nl/). Look at our other repositories on our 
-[GitHub account](https://github.com/orgs/Coffee-IT-Development/repositories).
+Created by [Coffee IT](https://coffeeit.nl/).
 
 <img src="https://i.imgur.com/PZkGq79.gif" width="300">
 
@@ -113,6 +112,8 @@ The changelog can be found [here](https://github.com/Coffee-IT-Development/Pinco
 # 🔗 Related publications
 
 - [Aroma Pincode Component for iOS](https://github.com/Coffee-IT-Development/Pincode-iOS-Component)
+
+Look at our other repositories on our [GitHub account](https://github.com/orgs/Coffee-IT-Development/repositories).
 
 # 📧 Contact
 
