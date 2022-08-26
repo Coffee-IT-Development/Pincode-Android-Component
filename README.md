@@ -68,6 +68,7 @@ lateinit var binding: ActivityMainBinding
 ```
 
 ## ⚙️ Customisation
+
 __`PincodeView` accepts the following optional parameters for in depth customisation:__
 
 - `lengthOfCode` - An integer that decides the length of the pincode (default 6)
@@ -107,17 +108,10 @@ the timer starts counting down and the send button gets disabled. Should be set 
 
 # ✏️ Changelog
 
-Version 1.0.1 *(18-08-2022)*
-----------------------------
-* Renamed `resend` methods, variables and constants to `send`.
-* Removed `triggerResendOnInit`, a `Boolean` formerly used to decide whether `onSend` should be ran when initializing the component.
-* Added `sendCodeLiveData`, a `Boolean` which triggers `onSend`.
-
-Version 1.0.0 *(28-07-2022)*
-----------------------------
-* Added PincodeView component.
+The changelog can be found [here](https://github.com/Coffee-IT-Development/Pincode-Android-Component/blob/main/CHANGELOG.md).
 
 # 📧 Contact
+
 Do you have questions, ideas or need help? Send us an email at contact@coffeeit.nl.
 
 <picture>
@@ -127,4 +121,5 @@ Do you have questions, ideas or need help? Send us an email at contact@coffeeit.
 </picture>
 
 # ⚠️ License
+
 Android Aroma Pincode is licensed under the terms of the [MIT Open Source license](https://github.com/Coffee-IT-Development/Pincode-Android-Component/blob/main/LICENSE).
