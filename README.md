@@ -27,7 +27,7 @@ This component requires minimum __SDK 21__.
 Add the following to `build.gradle`:
 ```
 dependencies {
-    implementation "nl.coffeeit.aroma:pincode:1.0.1"
+    implementation "nl.coffeeit.aroma:pincode:1.0.2"
 }
 ```
 
