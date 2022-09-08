@@ -24,10 +24,19 @@ Created by [Coffee IT](https://coffeeit.nl/).
 
 This component requires minimum __SDK 21__.
 
-Add the following to `build.gradle`:
-```
+Add the dependency to `build.gradle`.
+
+Groovy:
+```Groovy
 dependencies {
     implementation "nl.coffeeit.aroma:pincode:1.0.2"
+}
+```
+
+KTS:
+```Kotlin
+dependencies {
+    implementation("nl.coffeeit.aroma:pincode:1.0.2")
 }
 ```
 
@@ -35,7 +44,7 @@ dependencies {
 
 To use the component as in a Compose project, simply add it to your code as is. This example showcases a simple version:
 
-```
+```Kotlin
 PincodeView(
     pincodeLiveData = pincode,
     isErrorLiveData = isError,
@@ -51,7 +60,7 @@ PincodeView(
 
 To use the component as part of a XML-based project, add a `ComposeView` element to your layout file and call the `setContent` method in your activity/fragment:
 
-```
+```Kotlin
 lateinit var binding: ActivityMainBinding
     private val isError = MutableLiveData(false)
     private val pincode = MutableLiveData("")
